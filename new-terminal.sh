@@ -10,18 +10,20 @@ echo "Starting terminal configuration installation..."
 if [ ! -d "$TERMINAL_CONFIG_DIR/.git" ]; then
     echo "Cloning terminal configuration to $TERMINAL_CONFIG_DIR..."
     
-    # If .config exists but isn't our repo, we move into it and clone the contents
-    if [ -d "$TERMINAL_CONFIG_DIR" ]; then
-        # Use a temporary clone and move contents to avoid "directory not empty" errors
-        TEMP_DIR=$(mktemp -d)
-        git clone -q https://github.com/jacobwiseberg/.config.git "$TEMP_DIR" &> /dev/null
-        cp -r "$TEMP_DIR/." "$TERMINAL_CONFIG_DIR/"
-        rm -rf "$TEMP_DIR"
-        cd "$TERMINAL_CONFIG_DIR"
-    else
-        # If it doesn't exist at all, clone normally
-        git clone -q https://github.com/jacobwiseberg/.config.git "$TERMINAL_CONFIG_DIR" &> /dev/null
-    fi
+    # Create the dir if it doesn't exist
+    mkdir -p "$TERMINAL_CONFIG_DIR"
+    cd "$TERMINAL_CONFIG_DIR"
+
+    # Initialize a new repo in the existing folder
+    git init -q
+    git remote add origin https://github.com/jacobwiseberg/.config.git
+    
+    # Fetch and force reset to overwrite any local conflicting files
+    git fetch -q origin
+    git checkout -q -f main
+    
+    # Set the upstream so git pull works later
+    git branch --set-upstream-to=origin/main main
 else
     echo "Configuration directory already exists. Pulling latest changes..."
     cd "$TERMINAL_CONFIG_DIR" && git pull -q &> /dev/null
