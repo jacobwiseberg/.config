@@ -8,25 +8,24 @@ echo "Starting terminal configuration installation..."
 
 # 1. Clone/Update Terminal Config Repository
 if [ ! -d "$TERMINAL_CONFIG_DIR/.git" ]; then
-    echo "Cloning terminal configuration to $TERMINAL_CONFIG_DIR..."
+    echo "Initializing terminal configuration in $TERMINAL_CONFIG_DIR..."
     
-    # Create the dir if it doesn't exist
     mkdir -p "$TERMINAL_CONFIG_DIR"
     cd "$TERMINAL_CONFIG_DIR"
 
-    # Initialize a new repo in the existing folder
+    # Initialize and map to your GitHub
     git init -q
     git remote add origin https://github.com/jacobwiseberg/.config.git
     
-    # Fetch and force reset to overwrite any local conflicting files
+    # Fetch and force-align with the main branch
     git fetch -q origin
     git checkout -q -f main
     
-    # Set the upstream so git pull works later
+    # Set the upstream so future 'git pull' commands know where to go
     git branch --set-upstream-to=origin/main main
 else
-    echo "Configuration directory already exists. Pulling latest changes..."
-    cd "$TERMINAL_CONFIG_DIR" && git pull -q &> /dev/null
+    echo "Configuration directory already exists. Preparing for sync..."
+    cd "$TERMINAL_CONFIG_DIR"
 fi
 
 # 2. Install Oh My Zsh
@@ -67,6 +66,11 @@ ln -sf "$TERMINAL_CONFIG_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 
 # Ensure Neovim config directory exists
 mkdir -p "$HOME/.config/nvim"
+
+# 7. Final Repository Sync
+echo "Performing final sync..."
+cd "$TERMINAL_CONFIG_DIR"
+git pull -q origin main &> /dev/null
 
 echo "-------------------------------------------------------"
 echo "Installation complete."
