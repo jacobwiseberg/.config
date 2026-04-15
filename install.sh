@@ -41,6 +41,13 @@ if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
     git clone -q https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm" &> /dev/null
 fi
 
+# Install fzf
+if [ ! -d "$HOME/.fzf" ]; then
+    echo "Installing fzf..."
+    git clone -q --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf" &> /dev/null
+    "$HOME/.fzf/install" --all --quiet &> /dev/null
+fi
+
 # 5. Create Symlinks
 echo "Creating symlinks..."
 ln -sf "$TERMINAL_CONFIG_DIR/zsh/.zshrc" "$HOME/.zshrc"

@@ -1,6 +1,6 @@
 # --- Pathing & Oh My Zsh ---
-# Using $HOME ensures this works on Mac, Linux, and Docker
 export ZSH="$HOME/.oh-my-zsh"
+export FZF_BASE="$HOME/.fzf"
 
 # Set the theme
 ZSH_THEME="lukerandall"
