@@ -49,6 +49,13 @@ ln -sf "$TERMINAL_CONFIG_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 # Ensure Neovim config directory exists
 mkdir -p "$HOME/.config/nvim"
 
+# 6. Pathing Fix (Self-Healing)
+# This replaces any hardcoded /.oh-my-zsh paths with the dynamic $HOME variable
+if grep -q "export ZSH=\"/.oh-my-zsh\"" "$HOME/.zshrc"; then
+    echo "Fixing Zsh pathing in .zshrc..."
+    sed -i "s|export ZSH=\"/.oh-my-zsh\"|export ZSH=\"\$HOME/.oh-my-zsh\"|g" "$HOME/.zshrc"
+fi
+
 echo "-------------------------------------------------------"
 echo "Installation complete."
 echo "1. Restart your terminal or run: source ~/.zshrc"
