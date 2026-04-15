@@ -1,82 +1,57 @@
 #!/bin/bash
 
-# Exit on error
-set -e
+# --- Setup Variables ---
+TERMINAL_CONFIG_DIR="$HOME/.config"
+ZSH_CUSTOM_PLUGINS="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
 
-# 1. Variables
-REPO_URL="https://github.com/jacobwiseberg/.config"
-DOTFILES_DIR="$HOME/.config"
+echo "Starting terminal configuration installation..."
 
-# 2. Clone or Update the Repository
-if [ ! -d "$DOTFILES_DIR/.git" ]; then
-    echo "Cloning config repository into $DOTFILES_DIR..."
-    
-    # Handle case where .config exists but is not a git repo
-    if [ -d "$DOTFILES_DIR" ]; then
-        echo "Merging with existing .config directory..."
-        TEMP_DIR=$(mktemp -d)
-        git clone "$REPO_URL" "$TEMP_DIR"
-        cp -rn "$TEMP_DIR/." "$DOTFILES_DIR/"
-        rm -rf "$TEMP_DIR"
-        cd "$DOTFILES_DIR"
-        git init
-        git remote add origin "$REPO_URL"
-        git fetch
-        git checkout -t origin/main -f
-    else
-        git clone "$REPO_URL" "$DOTFILES_DIR"
-    fi
+# 1. Clone/Update Terminal Config Repository
+if [ ! -d "$TERMINAL_CONFIG_DIR/.git" ]; then
+    echo "Cloning terminal configuration to $TERMINAL_CONFIG_DIR..."
+    git clone -q https://github.com/jacobwiseberg/.config.git "$TERMINAL_CONFIG_DIR" &> /dev/null
 else
-    echo "Updating existing dotfiles repository..."
-    cd "$DOTFILES_DIR"
-    git pull origin main
+    echo "Configuration directory already exists. Pulling latest changes..."
+    cd "$TERMINAL_CONFIG_DIR" && git pull -q &> /dev/null
 fi
 
-# 3. Define Sub-Paths
-ZSH_DIR="$DOTFILES_DIR/zsh"
-TMUX_DIR="$DOTFILES_DIR/tmux"
-
-# 4. Setup Oh My Zsh
-if [ ! -d "$ZSH_DIR/.oh-my-zsh" ]; then
-    echo "Installing Oh My Zsh..."
-    export ZSH="$ZSH_DIR/.oh-my-zsh"
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-else
-    echo "Oh My Zsh is already installed."
+# 2. Install Oh My Zsh
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    echo "Cloning Oh My Zsh..."
+    git clone -q https://github.com/ohmyzsh/ohmyzsh.git "$HOME/.oh-my-zsh" &> /dev/null
 fi
 
-# 5. Install Zsh Plugins
-ZSH_CUSTOM_PLUGINS="$ZSH_DIR/custom/plugins"
+# 3. Install Zsh Plugins
+echo "Installing Zsh plugins..."
 mkdir -p "$ZSH_CUSTOM_PLUGINS"
-plugins=("zsh-users/zsh-autosuggestions" "zsh-users/zsh-syntax-highlighting")
 
-for repo in "${plugins[@]}"; do
-    plugin_name=$(basename "$repo")
-    if [ ! -d "$ZSH_CUSTOM_PLUGINS/$plugin_name" ]; then
-        echo "Cloning $plugin_name..."
-        git clone --depth=1 "https://github.com/$repo" "$ZSH_CUSTOM_PLUGINS/$plugin_name"
-    fi
-done
-
-# 6. Setup Tmux Plugin Manager (TPM)
-if [ ! -d "$TMUX_DIR/plugins/tpm" ]; then
-    echo "Installing TPM..."
-    mkdir -p "$TMUX_DIR/plugins"
-    git clone https://github.com/tmux-plugins/tpm "$TMUX_DIR/plugins/tpm"
+# Autosuggestions
+if [ ! -d "$ZSH_CUSTOM_PLUGINS/zsh-autosuggestions" ]; then
+    git clone -q https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM_PLUGINS/zsh-autosuggestions" &> /dev/null
 fi
 
-# 7. Neovim Preparation
-mkdir -p "$HOME/.local/share/nvim" "$HOME/.local/state/nvim"
+# Syntax Highlighting
+if [ ! -d "$ZSH_CUSTOM_PLUGINS/zsh-syntax-highlighting" ]; then
+    git clone -q https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM_PLUGINS/zsh-syntax-highlighting" &> /dev/null
+fi
 
-# 8. Symlinks
+# 4. Install Tmux Plugin Manager (TPM)
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+    echo "Installing Tmux Plugin Manager..."
+    git clone -q https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm" &> /dev/null
+fi
+
+# 5. Create Symlinks
 echo "Creating symlinks..."
-# Force create symbolic links to home directory
-ln -sf "$ZSH_DIR/.zshrc" "$HOME/.zshrc"
-ln -sf "$TMUX_DIR/tmux.conf" "$HOME/.tmux.conf"
+ln -sf "$TERMINAL_CONFIG_DIR/zsh/.zshrc" "$HOME/.zshrc"
+ln -sf "$TERMINAL_CONFIG_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 
-echo "Installation complete."
+# Ensure Neovim config directory exists
+mkdir -p "$HOME/.config/nvim"
+
 echo "-------------------------------------------------------"
+echo "Installation complete."
 echo "1. Restart your terminal or run: source ~/.zshrc"
-echo "2. Open 'nvim' and wait for Lazy.nvim to sync plugins."
+echo "2. Open 'nvim' (Lazy.nvim will auto-install plugins)."
 echo "3. Open 'tmux' and press 'prefix + I' to fetch plugins."
 echo "-------------------------------------------------------"
