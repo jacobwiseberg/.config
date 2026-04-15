@@ -49,11 +49,12 @@ ln -sf "$TERMINAL_CONFIG_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 # Ensure Neovim config directory exists
 mkdir -p "$HOME/.config/nvim"
 
-# 6. Pathing Fix (Self-Healing)
-# This replaces any hardcoded /.oh-my-zsh paths with the dynamic $HOME variable
+# 6. Pathing Fix (Crucial for Linux/Docker)
+# This finds the hardcoded root path and replaces it with the dynamic $HOME variable
 if grep -q "export ZSH=\"/.oh-my-zsh\"" "$HOME/.zshrc"; then
     echo "Fixing Zsh pathing in .zshrc..."
-    sed -i "s|export ZSH=\"/.oh-my-zsh\"|export ZSH=\"\$HOME/.oh-my-zsh\"|g" "$HOME/.zshrc"
+    # Using | as a delimiter for sed to avoid clashing with the forward slashes in paths
+    sed -i 's|export ZSH="/.oh-my-zsh"|export ZSH="$HOME/.oh-my-zsh"|g' "$HOME/.zshrc"
 fi
 
 echo "-------------------------------------------------------"
