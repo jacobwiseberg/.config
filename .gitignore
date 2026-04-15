@@ -6,14 +6,13 @@
 
 # Allow the root-level files
 !.gitignore
-!install.sh
+!new-terminal.sh
 
 # Whitelist config files
 !/zsh/.zshrc
-!/zsh/README.md
 !/tmux/tmux.conf
-!/tmux/README.md
 !/nvim/**
+!README.md
 
 # Blacklist the junk folders
 /zsh/.oh-my-zsh/
