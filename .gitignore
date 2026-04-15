@@ -1,0 +1,32 @@
+# Ignore everything
+*
+
+# Allow the directories themselves
+!*/
+
+# Allow the root-level files
+!.gitignore
+!install.sh
+
+# Whitelist config files
+!/zsh/.zshrc
+!/zsh/README.md
+!/tmux/tmux.conf
+!/tmux/README.md
+!/nvim/**
+
+# Blacklist the junk folders
+/zsh/.oh-my-zsh/
+/zsh/custom/plugins/*
+/zsh/.zsh_history
+/zsh/.zcompdump*
+/nvim/doc/tags
+**/tmux/plugins/**/.gitignore
+**/zsh/custom/plugins/**/.gitignore
+/nvim/.gitignore
+/tmux/plugins/*
+/zsh/custom/plugins/*
+/tmux/plugins/*
+*.log
+*.swp
+.DS_Store
