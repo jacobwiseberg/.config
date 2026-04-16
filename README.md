@@ -1,4 +1,4 @@
-# My Custom Terminal Configuration
+# .config
 
 A minimalist, whitelist-based terminal configuration for Zsh, Tmux, and Neovim. Designed for a "cold-start" setup—moving from a blank slate to a fully productive environment in under 60 seconds.
 
